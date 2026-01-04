@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>韩茹静生日快乐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        helloPink: '#FF9EBB',
+                        helloBlue: '#A7D7F9',
+                        helloYellow: '#FFF5BA',
+                        helloPurple: '#D4BBFF',
+                    },
+                    fontFamily: {
+                        cute: ['"Comic Sans MS"', '"Bubblegum Sans"', 'cursive'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .bubble-gradient-pink {
+                background: linear-gradient(135deg, #FF9EBB 0%, #FFC2D1 100%);
+            }
+            .bubble-gradient-blue {
+                background: linear-gradient(135deg, #A7D7F9 0%, #C7E7FF 100%);
+            }
+            .bubble-gradient-yellow {
+                background: linear-gradient(135deg, #FFF5BA 0%, #FFEBA1 100%);
+            }
+            .bubble-gradient-purple {
+                background: linear-gradient(135deg, #D4BBFF 0%, #E5D3FF 100%);
+            }
+            .particle {
+                position: absolute;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+            .bubble-appear {
+                animation: bubbleAppear 0.8s ease-out forwards;
+            }
+            @keyframes bubbleAppear {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.5) translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+            .particle-focus {
+                animation: particleFocus 3s ease-in-out forwards;
+            }
+            @keyframes particleFocus {
+                0% {
+                    transform: translate(random(-300px, 300px), random(-300px, 300px)) scale(0.5);
+                    opacity: 0.7;
+                }
+                70% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(var(--target-x), var(--target-y)) scale(1);
+                    opacity: 0;
+                }
+            }
+        }
+    </style>
+</head>
+<body class="overflow-hidden bg-gray-100 font-cute">
+    <!-- 画面1：密码弹窗 -->
+    <div id="screen1" class="w-screen h-screen flex flex-col items-center justify-center bg-helloBlue/30">
+        <div class="bg-white rounded-2xl p-8 w-80 shadow-2xl flex flex-col items-center">
+            <h1 class="text-3xl font-bold text-helloPink mb-6">韩茹静的生日祝福</h1>
+            <div class="w-full mb-6">
+                <label class="block text-gray-700 mb-2" for="password">请输入密码</label>
+                <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-helloPink" placeholder="输入4位密码">
+            </div>
+            <div class="flex gap-4">
+                <button id="confirmBtn" class="px-6 py-2 bg-helloPink text-white rounded-lg hover:bg-helloPink/80 transition">确定</button>
+                <button id="cancelBtn" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 画面2：HelloKitty聊天气泡 -->
+    <div id="screen2" class="w-screen h-screen bg-helloYellow/20 hidden relative p-4">
+        <div id="bubbleContainer" class="w-full h-full relative"></div>
+    </div>
+
+    <!-- 画面3：粒子聚焦生日文字 -->
+    <div id="screen3" class="w-screen h-screen bg-black hidden relative">
+        <div id="particleContainer" class="w-full h-full relative"></div>
+        <div id="birthdayText" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center opacity-0">
+            <h2 class="text-6xl font-bold text-helloPink mb-4">韩茹静</h2>
+            <p class="text-4xl font-bold text-helloBlue">happy birthday 老公永远爱你</p >
+        </div>
+    </div>
+
+    <script>
+        // 页面元素获取
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+        const screen3 = document.getElementById('screen3');
+        const passwordInput = document.getElementById('password');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const bubbleContainer = document.getElementById('bubbleContainer');
+        const particleContainer = document.getElementById('particleContainer');
+        const birthdayText = document.getElementById('birthdayText');
+
+        // 正确密码（生日月份0105）
+        const correctPassword = '0105';
+
+        // 画面1：确定按钮逻辑（密码验证+页面跳转）
+        confirmBtn.addEventListener('click', () => {
+            if (passwordInput.value === correctPassword) {
+                screen1.classList.add('hidden');
+                screen2.classList.remove('hidden');
+                createHelloKittyBubbles(); // 生成气泡
+            } else {
+                alert('密码错误，请重新输入～');
+                passwordInput.value = '';
+            }
+        });
+
+        // 画面1：取消按钮逻辑（清空输入）
+        cancelBtn.addEventListener('click', () => {
+            passwordInput.value = '';
+        });
+
+        // 画面2：30组HelloKitty主题祝福气泡（带名字“韩茹静”）
+        const bubbleBlessings = [
+            "韩茹静生日快乐！要像Kitty一样甜～",
+            "我的韩茹静，生日每天都有好心情呀～",
+            "韩茹静的生日，和HelloKitty一起庆祝！",
+            "祝韩茹静新岁无忧，可爱加倍～",
+            "韩茹静生日快乐，老公永远疼你哦～",
+            "韩茹静+HelloKitty=超甜生日！",
+            "韩茹静的生日愿望，一定都会实现～",
+            "祝韩茹静每天都像生日这样开心～",
+            "韩茹静生日快乐，平安喜乐常伴～",
+            "HelloKitty陪韩茹静过超棒生日！",
+            "韩茹静新岁要更爱自己，更幸福～",
+            "韩茹静生日快乐，所有美好都属于你～",
+            "韩茹静的生日，甜度满分！",
+            "祝韩茹静生日当天，惊喜满满～",
+            "韩茹静+生日=最可爱的一天！",
+            "韩茹静生日快乐，老公永远在你身边～",
+            "HelloKitty为韩茹静送上生日祝福～",
+            "韩茹静新岁万事顺意，笑容常在～",
+            "韩茹静生日快乐，每天都有小幸运～",
+            "韩茹静的生日，要尽情快乐呀～",
+            "祝韩茹静生日，被爱包围～",
+            "韩茹静生日快乐，可爱永不过期～",
+            "HelloKitty和我，都祝韩茹静生日快乐～",
+            "韩茹静新岁要继续闪闪发光～",
+            "韩茹静生日快乐，不止今日，而是每天～",
+            "韩茹静的生日，是超幸福的一天！",
+            "祝韩茹静生日，心想事成～",
+            "韩茹静生日快乐，老公永远爱你哟～",
+            "HelloKitty陪韩茹静开启幸福新岁～",
+            "韩茹静生日快乐，美好与你不期而遇～"
+        ];
+
+        // 生成气泡（避免遮挡+逐个弹出）
+        function createHelloKittyBubbles() {
+            const containerW = bubbleContainer.offsetWidth;
+            const containerH = bubbleContainer.offsetHeight;
+            const bubbleSizes = [120, 140, 160]; // 气泡尺寸随机
+            const bubbleGradients = ['bubble-gradient-pink', 'bubble-gradient-blue', 'bubble-gradient-yellow', 'bubble-gradient-purple']; // 渐变颜色
+            const usedPositions = []; // 记录已用位置，避免遮挡
+
+            // 随机位置生成（避免重叠）
+            const getRandomPos = (size) => {
+                let x, y, isOverlap;
+                do {
+                    x = Math.floor(Math.random() * (containerW - size));
+                    y = Math.floor(Math.random() * (containerH - size));
+                    // 检查是否与已生成气泡重叠（间距150px以上）
+                    isOverlap = usedPositions.some(pos => Math.abs(x - pos.x) < 150 && Math.abs(y - pos.y) < 150);
+                } while (isOverlap);
+                usedPositions.push({x, y});
+                return {x, y};
+            };
+
+            // 逐个生成气泡（间隔300ms弹出）
+            bubbleBlessings.forEach((blessing, index) => {
+                setTimeout(() => {
+                    const size = bubbleSizes[Math.floor(Math.random() * bubbleSizes.length)];
+                    const gradient = bubbleGradients[Math.floor(Math.random() * bubbleGradients.length)];
+                    const {x, y} = getRandomPos(size);
+
+                    // 创建气泡元素
+                    const bubble = document.createElement('div');
+                    bubble.className = `absolute rounded-2xl p-4 shadow-lg bubble-appear ${gradient} flex flex-col items-center justify-center text-white`;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${x}px`;
+                    bubble.style.top = `${y}px`;
+
+                    // 气泡内容（HelloKitty图标+祝福文字）
+                    bubble.innerHTML = `
+                        <<i class="fa fa-heart text-2xl mb-2"></</i>
+                        <p class="text-center font-bold">${blessing}</p >
+                    `;
+
+                    bubbleContainer.appendChild(bubble);
+
+                    // 30个气泡全部生成后，跳转画面3
+                    if (index === bubbleBlessings.length - 1) {
+                        setTimeout(() => {
+                            screen2.classList.add('hidden');
+                            screen3.classList.remove('hidden');
+                            createParticleFocus(); // 生成粒子聚焦效果
+                        }, 2000);
+                    }
+                }, index * 300);
+            });
+        }
+
+        // 画面3：粒子聚焦合成文字
+        function createParticleFocus() {
+            const particleCount = 800; // 粒子数量
+            const textW = birthdayText.offsetWidth;
+            const textH = birthdayText.offsetHeight;
+            const textX = birthdayText.offsetLeft + textW / 2;
+            const textY = birthdayText.offsetTop + textH / 2;
+
+            // 生成彩色粒子
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle particle-focus';
+                // 粒子大小随机（2-8px）
+                particle.style.width = `${Math.random() * 6 + 2}px`;
+                particle.style.height = `${Math.random() * 6 + 2}px`;
+                // 粒子颜色随机（可爱风配色）
+                particle.style.backgroundColor = ['#FF9EBB', '#A7D7F9', '#FFF5BA', '#D4BBFF'][Math.floor(Math.random() * 4)];
+                // 粒子目标位置（文字区域内）
+                particle.style.setProperty('--target-x', `${textX + Math.random() * textW - textW/2}px`);
+                particle.style.setProperty('--target-y', `${textY + Math.random() * textH - textH/2}px`);
+                
+                particleContainer.appendChild(particle);
+            }
+
+            // 粒子聚焦后显示文字
+            setTimeout(() => {
+                birthdayText.classList.add('transition-opacity', 'duration-1000');
+                birthdayText.style.opacity = '1';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
